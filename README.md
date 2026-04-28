@@ -1,127 +1,135 @@
-# Nuxt AI Chatbot Template
+# MiniMax AI 对话平台
 
-[![Nuxt UI](https://img.shields.io/badge/Made%20with-Nuxt%20UI-00DC82?logo=nuxt&labelColor=020420)](https://ui.nuxt.com)
+基于 MiniMax 大模型的智能对话应用，集成多模态 AI 能力（文本对话 / 图片生成 / 音乐生成 / 视频生成 / 语音合成），使用 [Nuxt UI](https://ui.nuxt.com) + [AI SDK](https://ai-sdk.dev) 构建。
 
-Full-featured AI Chatbot Nuxt application with authentication, chat history, collapsible sidebar, keyboard shortcuts, light & dark mode, command palette and more. Built using [Nuxt UI](https://ui.nuxt.com) components and integrated with [AI SDK](https://ai-sdk.dev) for a complete chat experience.
+## 功能特性
 
-- [Live demo](https://chat-template.nuxt.dev/)
-- [Documentation](https://ui.nuxt.com/docs/getting-started/installation/nuxt)
+- **文本对话** — MiniMax-M2.7 / M2.5-Turbo / Text-01 等模型，流式响应
+- **图片生成** — MiniMax Image-01 模型，支持多种宽高比
+- **音乐生成** — 输入歌词或描述，生成完整音乐
+- **视频生成** — Hailuo-2.3 模型，文生视频
+- **语音合成** — TTS HD 高质量语音，支持多种音色调节
+- **对话管理** — 历史记录持久化，公开/私密分享
+- **文件上传** — 拖拽上传，图片/文档支持
+- **GitHub 登录** — OAuth 认证，数据隔离
 
-<a href="https://chat-template.nuxt.dev/" target="_blank">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://ui.nuxt.com/assets/templates/nuxt/chat-dark.png">
-    <source media="(prefers-color-scheme: light)" srcset="https://ui.nuxt.com/assets/templates/nuxt/chat-light.png">
-    <img alt="Nuxt AI Chatbot Template" src="https://ui.nuxt.com/assets/templates/nuxt/chat-light.png">
-  </picture>
-</a>
+## 技术栈
 
-> The chat template for Vue is on https://github.com/nuxt-ui-templates/chat-vue.
+| 层级 | 技术 |
+|------|------|
+| 前端框架 | Nuxt 4 + Vue 3 + Nuxt UI 4 |
+| AI 集成 | AI SDK (Vercel) + MiniMax API |
+| 数据库 | SQLite (开发) / Turso (生产) + Drizzle ORM |
+| 文件存储 | NuxtHub Blob (本地 / Vercel Blob / R2) |
+| 认证 | nuxt-auth-utils + GitHub OAuth |
 
-## Features
+## 本地开发
 
-- ⚡️ **Streaming AI messages** powered by the [AI SDK](https://ai-sdk.dev) with thinking/reasoning support
-- 🤖 **Multiple model support** — Claude Haiku 4.5, Gemini 3 Flash and GPT-5 Nano via [Vercel AI Gateway](https://vercel.com/docs/ai-gateway)
-- 🔍 **Web search** with built-in provider tools (Anthropic, OpenAI)
-- 📊 **Charts and weather** tool calling with rich UI rendering
-- 🔐 **Authentication** via GitHub OAuth using [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils)
-- 💾 **Chat history persistence** using SQLite database ([Turso](https://turso.tech) in production) and [Drizzle ORM](https://orm.drizzle.team)
-- 📎 **File uploads** with drag & drop using [NuxtHub Blob](https://hub.nuxt.com/docs/blob) (requires authentication)
-- ✨ **Markdown rendering** with streaming code highlighting via [Comark](https://comark.dev)
-
-## Quick Start
-
-```bash
-npm create nuxt@latest -- -t ui/chat
-```
-
-## Deploy your own
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnuxt-ui-templates%2Fchat&repository-name=chat&env=NUXT_OAUTH_GITHUB_CLIENT_ID%2CNUXT_OAUTH_GITHUB_CLIENT_SECRET%2CNUXT_SESSION_PASSWORD&stores=%5B%7B%22type%22%3A%22integration%22%2C%22integrationSlug%22%3A%22tursocloud%22%2C%22productSlug%22%3A%22database%22%2C%22protocol%22%3A%22storage%22%7D%2C%7B%22type%22%3A%22blob%22%7D%5D&demo-title=Nuxt+Chat+Template&demo-description=An+AI+chatbot+template+with+GitHub+authentication+and+persistent+chat+history+powered+by+Vercel+AI+SDK.&demo-url=https%3A%2F%2Fchat-template.nuxt.dev&demo-image=https%3A%2F%2Fui.nuxt.com%2Fassets%2Ftemplates%2Fnuxt%2Fchat-dark.png)
-
-## Setup
-
-Make sure to install the dependencies:
+### 1. 安装依赖
 
 ```bash
 pnpm install
 ```
 
-Run database migrations:
+### 2. 配置环境变量
+
+创建 `.env` 文件：
 
 ```bash
-pnpm db:migrate
-```
+# MiniMax API（必填）
+MINIMAX_API_KEY=your_minimax_api_key
+MINIMAX_GROUP_ID=your_minimax_group_id
 
-> [!NOTE]
-> In production, configure your database connection. On Vercel, add the [Turso integration](https://vercel.com/integrations/turso) to automatically provision `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN`.
+# 后端地址（开发环境指向本地 Java 后端）
+NUXT_PUBLIC_API_BASE_URL=http://localhost:8080
 
-### AI Integration
+# GitHub OAuth（可选，不填则无法登录）
+NUXT_OAUTH_GITHUB_CLIENT_ID=your_github_client_id
+NUXT_OAUTH_GITHUB_CLIENT_SECRET=your_github_client_secret
+NUXT_SESSION_PASSWORD=your_random_session_password_32chars
 
-This template uses the [Vercel AI SDK](https://ai-sdk.dev/) for streaming AI responses with support for multiple providers through [Vercel AI Gateway](https://vercel.com/docs/ai-gateway). When deployed on Vercel, the AI Gateway is configured automatically.
-
-For local development, set your API key in `.env`:
-
-```bash
-AI_GATEWAY_API_KEY=<your-vercel-ai-gateway-api-key>
+# 文件存储（可选，默认使用本地 .data/blob）
+# BLOB_READ_WRITE_TOKEN=your_blob_token
 ```
 
 > [!TIP]
-> With [Vercel AI Gateway](https://vercel.com/docs/ai-gateway), you don't need individual API keys for OpenAI, Anthropic, etc. It provides a unified API to access hundreds of models through a single endpoint with automatic load balancing, fallbacks, and spend monitoring.
+> MiniMax API Key 和 Group ID 在 [MiniMax Platform](https://platform.minimaxi.com) 获取。
 
-### Authentication (Optional)
+### 3. 启动后端
 
-This template uses [nuxt-auth-utils](https://github.com/atinux/nuxt-auth-utils) for authentication with GitHub OAuth.
-
-To enable authentication, [create a GitHub OAuth application](https://github.com/settings/applications/new) and set:
+Java 后端项目 [JOSP-MiniMaxApi](https://github.com/junwOpenSourceProjects/JOSP-MiniMaxApi)：
 
 ```bash
-NUXT_OAUTH_GITHUB_CLIENT_ID=<your-github-oauth-app-client-id>
-NUXT_OAUTH_GITHUB_CLIENT_SECRET=<your-github-oauth-app-client-secret>
-NUXT_SESSION_PASSWORD=<your-password-minimum-32-characters>
+cd ../JOSP-MiniMaxApi
+mvn spring-boot:run
 ```
 
-### Blob Storage (Optional)
+后端默认运行在 `http://localhost:8080`。
 
-This template uses [NuxtHub Blob](https://hub.nuxt.com/docs/blob) for file uploads, which supports multiple storage drivers:
-
-- **Local filesystem** (default for development, stored in `.data/blob`)
-- **[Vercel Blob](https://vercel.com/docs/vercel-blob)** (auto-configured when deployed to Vercel)
-- **[Cloudflare R2](https://hub.nuxt.com/docs/blob#set-a-driver)** (when deployed to Cloudflare)
-- **[Amazon S3](https://hub.nuxt.com/docs/blob#set-a-driver)** (with manual configuration)
-
-For **Vercel Blob**, assign a Blob Store to your project from the Vercel dashboard (Project → Storage), then set the token for local development:
-
-```bash
-BLOB_READ_WRITE_TOKEN=<your-vercel-blob-token>
-```
-
-> [!NOTE]
-> File uploads require authentication. See the [NuxtHub Blob documentation](https://hub.nuxt.com/docs/blob#set-a-driver) for configuring other storage drivers.
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
+### 4. 启动前端
 
 ```bash
 pnpm dev
 ```
 
-## Production
+访问 `http://localhost:3000`。
 
-Build the application for production:
-
-```bash
-pnpm build
-```
-
-Locally preview production build:
+### 5. 数据库迁移
 
 ```bash
-pnpm preview
+pnpm db:migrate
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## 项目结构
 
-## Renovate integration
+```
+JOSP-MiniMaxApiVue3/
+├── app/
+│   ├── components/          # Vue 组件
+│   │   ├── chat/            # 对话相关组件
+│   │   └── MiniMaxPanel.vue # 多模态 AI 面板（文生图/音乐/视频/TTS）
+│   ├── composables/          # 组合式函数
+│   ├── layouts/              # 布局
+│   └── pages/               # 页面
+│       ├── index.vue        # 首页
+│       └── chat/[id].vue    # 对话页
+├── server/
+│   ├── api/                 # API 路由
+│   │   ├── chats/           # 对话 CRUD
+│   │   ├── minimax/         # MiniMax 多模态代理
+│   │   └── upload/          # 文件上传
+│   └── db/                  # 数据库 Schema
+└── shared/                  # 前后端共享
+    └── utils/models.ts      # MiniMax 模型定义
+```
 
-Install [Renovate GitHub app](https://github.com/apps/renovate/installations/select_target) on your repository and you are good to go.
+## 部署
+
+推荐使用 Vercel，克隆后配置以下环境变量：
+
+| 环境变量 | 说明 |
+|----------|------|
+| `MINIMAX_API_KEY` | MiniMax API Key |
+| `MINIMAX_GROUP_ID` | MiniMax Group ID |
+| `NUXT_PUBLIC_API_BASE_URL` | 后端地址（Vercel 部署时指向线上后端） |
+| `NUXT_OAUTH_GITHUB_CLIENT_ID` | GitHub OAuth Client ID |
+| `NUXT_OAUTH_GITHUB_CLIENT_SECRET` | GitHub OAuth Client Secret |
+| `NUXT_SESSION_PASSWORD` | Session 加密密码（32字符随机字符串） |
+| `TURSO_DATABASE_URL` | Turso 数据库 URL（生产） |
+| `TURSO_AUTH_TOKEN` | Turso 认证 Token（生产） |
+
+## 后端 API
+
+后端项目 [JOSP-MiniMaxApi](https://github.com/junwOpenSourceProjects/JOSP-MiniMaxApi) 提供以下接口：
+
+| 接口 | 说明 |
+|------|------|
+| `POST /api/chat/chat` | 文本对话（流式） |
+| `POST /api/minimax/image` | 图片生成 |
+| `POST /api/minimax/music` | 音乐生成 |
+| `POST /api/minimax/video` | 视频生成（异步轮询） |
+| `POST /api/minimax/speech` | 语音合成 |
+
+## License
+
+MIT
