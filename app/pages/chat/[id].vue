@@ -90,6 +90,7 @@ async function handleSubmit(e: Event) {
 }
 
 const editingMessageId = ref<string | null>(null)
+const showMultimodal = ref(false)
 
 function startEdit(message: UIMessage) {
   if (editingMessageId.value) return
@@ -268,6 +269,15 @@ onMounted(() => {
                 <ChatFileUploadButton :open="open" />
 
                 <ModelSelect />
+
+                <UButton
+                  icon="i-lucide-sparkles"
+                  color="neutral"
+                  size="sm"
+                  variant="ghost"
+                  title="多模态生成"
+                  @click="showMultimodal = true"
+                />
               </div>
 
               <UChatPromptSubmit
@@ -288,4 +298,11 @@ onMounted(() => {
   <UContainer v-else class="flex-1 flex flex-col gap-4 sm:gap-6">
     <UError :error="{ statusMessage: '对话未找到', statusCode: 404 }" class="min-h-full" />
   </UContainer>
+
+  <!-- 多模态生成弹窗 -->
+  <UModal v-model:open="showMultimodal" title="MiniMax 多模态生成" class="max-w-2xl">
+    <div class="p-4">
+      <MiniMaxPanel />
+    </div>
+  </UModal>
 </template>
