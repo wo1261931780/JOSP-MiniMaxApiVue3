@@ -1,5 +1,5 @@
 import type { UIMessage } from 'ai'
-import { convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse } from 'ai'
+import { createUIMessageStream, createUIMessageStreamResponse } from 'ai'
 import { db, schema } from 'hub:db'
 import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
@@ -60,7 +60,18 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // 提取用户最后一条消息内容
   const lastMessage = messages[messages.length - 1]
+  const lastUserContent = (() => {
+    if (!lastMessage || lastMessage.role !== 'user') return ''
+    const content = lastMessage.content
+    if (typeof content === 'string') return content
+    if (Array.isArray(content)) {
+      return content.map((part: any) => part.type === 'text' ? part.text : '').join('')
+    }
+    return ''
+  })()
+
   if (lastMessage?.role === 'user' && messages.length > 1) {
     await db.insert(schema.messages).values({
       id: lastMessage.id,
@@ -75,13 +86,10 @@ export default defineEventHandler(async (event) => {
 
   // 从 runtimeConfig 读取后端地址
   const config = useRuntimeConfig()
-  const backendUrl = `${config.public.apiBaseUrl}/minimax/chat/chat`
+  const backendUrl = `${config.public.apiBaseUrl}/api/chat/chat`
 
   const stream = createUIMessageStream({
     execute: async ({ writer }) => {
-      // 将 AI SDK 消息格式转换为 MiniMax 格式
-      const minimaxMessages = await convertToModelMessages(messages)
-
       const response = await fetch(backendUrl, {
         method: 'POST',
         signal: abortController.signal,
@@ -90,14 +98,8 @@ export default defineEventHandler(async (event) => {
         },
         body: JSON.stringify({
           model: model,
-          messages: minimaxMessages.map((msg: any) => {
-            if (msg.role === 'user') {
-              return { role: 'user', content: msg.content }
-            } else if (msg.role === 'assistant') {
-              return { role: 'assistant', content: msg.content }
-            }
-            return msg
-          })
+          message: lastUserContent,
+          systemPrompt: ''
         })
       })
 

@@ -76,7 +76,9 @@ async function generateImage() {
         prompt: imageInput.value
       }
     })
-    imageResult.value = (response as any).url
+    // 后端返回 JSON 数组字符串，取第一张
+    const urls = JSON.parse((response as any).data || '[]')
+    imageResult.value = urls[0] || null
   } catch (error) {
     console.error('Failed to generate image:', error)
   } finally {
@@ -245,7 +247,7 @@ function handleSubmit() {
           icon="i-lucide-download"
           variant="outline"
           size="sm"
-          @click="() => window.open(imageResult, '_blank')"
+          @click="() => { const a = document.createElement('a'); a.href = imageResult; a.download = 'image.png'; a.click() }"
         />
       </div>
     </div>
@@ -261,7 +263,7 @@ function handleSubmit() {
           icon="i-lucide-download"
           variant="outline"
           size="sm"
-          @click="() => window.open(musicResult, '_blank')"
+          @click="() => { const a = document.createElement('a'); a.href = musicResult; a.download = 'music.mp3'; a.click() }"
         />
       </div>
     </div>
@@ -277,7 +279,7 @@ function handleSubmit() {
           icon="i-lucide-download"
           variant="outline"
           size="sm"
-          @click="() => window.open(videoResult, '_blank')"
+          @click="() => { const a = document.createElement('a'); a.href = videoResult; a.download = 'video.mp4'; a.click() }"
         />
       </div>
     </div>
@@ -293,7 +295,7 @@ function handleSubmit() {
           icon="i-lucide-download"
           variant="outline"
           size="sm"
-          @click="() => window.open(ttsResult, '_blank')"
+          @click="() => { const a = document.createElement('a'); a.href = ttsResult; a.download = 'audio.mp3'; a.click() }"
         />
       </div>
     </div>
