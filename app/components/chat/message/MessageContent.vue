@@ -39,7 +39,7 @@ const emit = defineEmits<{
       />
       <UChatTool
         v-else-if="getToolName(part) === 'web_search' || getToolName(part) === 'google_search'"
-        :text="isToolStreaming(part) ? 'Searching the web...' : 'Searched the web'"
+        :text="isToolStreaming(part) ? '正在搜索...' : '已完成网络搜索'"
         :suffix="getSearchQuery(part)"
         :streaming="isToolStreaming(part)"
         chevron="leading"

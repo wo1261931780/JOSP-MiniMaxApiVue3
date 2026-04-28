@@ -38,7 +38,7 @@ export default defineEventHandler(async (event) => {
       )
     }
   } catch (error) {
-    console.error('Failed to list/delete chat files:', error)
+    console.error('[删除对话] 列出/删除对话文件失败:', error)
   }
 
   return await db.delete(schema.chats)

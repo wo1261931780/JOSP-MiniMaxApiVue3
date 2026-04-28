@@ -55,13 +55,13 @@ export function useFileUploadWithStatus(chatId: string) {
         const response = await upload(input) as BlobResult | BlobResult[] | undefined
 
         if (!response) {
-          throw new Error('Upload failed')
+          throw new Error('上传失败')
         }
 
         const result = Array.isArray(response) ? response[0] : response
 
         if (!result) {
-          throw new Error('Upload failed')
+          throw new Error('上传失败')
         }
 
         files.value[index] = {
@@ -73,9 +73,9 @@ export function useFileUploadWithStatus(chatId: string) {
       } catch (error) {
         const errorMessage = (error as { data?: { message?: string } }).data?.message
           || (error as Error).message
-          || 'Upload failed'
+          || '上传失败'
         toast.add({
-          title: 'Upload failed',
+          title: '上传失败',
           description: errorMessage,
           icon: 'i-lucide-alert-circle',
           color: 'error'

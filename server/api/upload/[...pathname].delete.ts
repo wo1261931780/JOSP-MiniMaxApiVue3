@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   if (!pathname.startsWith(`${username}/`)) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'You do not have permission to delete this file'
+      statusMessage: '您没有权限删除此文件'
     })
   }
 

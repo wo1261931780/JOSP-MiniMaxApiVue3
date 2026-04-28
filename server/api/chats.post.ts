@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   }).returning()
 
   if (!chat) {
-    throw createError({ statusCode: 500, statusMessage: 'Failed to create chat' })
+    throw createError({ statusCode: 500, statusMessage: '创建对话失败' })
   }
 
   await db.insert(schema.messages).values({

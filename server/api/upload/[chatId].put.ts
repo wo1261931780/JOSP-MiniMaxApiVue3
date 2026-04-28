@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
   if (chat && chat.userId !== userId) {
     throw createError({
       statusCode: 403,
-      statusMessage: 'You do not have permission to upload files to this chat'
+      statusMessage: '您没有权限向此对话上传文件'
     })
   }
 

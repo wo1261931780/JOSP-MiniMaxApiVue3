@@ -3,15 +3,7 @@ import { createUIMessageStream, createUIMessageStreamResponse } from 'ai'
 import { db, schema } from 'hub:db'
 import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
-
-// MiniMax 真实模型 ID（与 shared/utils/models.ts 保持一致）
-const MODELS = [
-  { label: 'MiniMax-Text-01（代码/分析）', value: 'MiniMax-Text-01' },
-  { label: 'MiniMax-M2（通用助手）', value: 'MiniMax-M2' },
-  { label: 'MiniMax-M2.5-Turbo（快速响应）', value: 'MiniMax-M2.5-Turbo' },
-  { label: 'MiniMax-M2.5-Pro（Pro 版本）', value: 'MiniMax-M2.5-Pro' },
-  { label: 'MiniMax-V2.01（视觉理解）', value: 'MiniMax-V2.01' }
-]
+import { MODELS } from '#shared/utils/models'
 
 defineRouteMeta({
   openAPI: {

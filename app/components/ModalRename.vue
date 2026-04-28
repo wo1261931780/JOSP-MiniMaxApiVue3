@@ -17,8 +17,8 @@ function submit() {
 
 <template>
   <UModal
-    title="Rename chat"
-    description="Choose a new title for this chat."
+    title="重命名对话"
+    description="为此对话选择一个新标题。"
     :ui="{
       footer: 'flex-row-reverse justify-start'
     }"
@@ -29,7 +29,7 @@ function submit() {
         v-model="value"
         autofocus
         size="lg"
-        placeholder="Chat title"
+        placeholder="对话标题"
         class="w-full"
         :ui="{ root: 'w-full' }"
         @keydown.enter.prevent="submit"
@@ -37,11 +37,11 @@ function submit() {
     </template>
 
     <template #footer>
-      <UButton label="Save" :disabled="!trimmed" @click="submit" />
+      <UButton label="保存" :disabled="!trimmed" @click="submit" />
       <UButton
         color="neutral"
         variant="ghost"
-        label="Cancel"
+        label="取消"
         @click="emit('close', false)"
       />
     </template>

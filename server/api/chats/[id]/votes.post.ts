@@ -33,11 +33,11 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!message) {
-    throw createError({ statusCode: 404, statusMessage: 'Message not found' })
+    throw createError({ statusCode: 404, statusMessage: '消息未找到' })
   }
 
   if (message.role !== 'assistant') {
-    throw createError({ statusCode: 400, statusMessage: 'Can only vote on assistant messages' })
+    throw createError({ statusCode: 400, statusMessage: '只能对助手消息进行投票' })
   }
 
   if (isUpvoted === undefined) {

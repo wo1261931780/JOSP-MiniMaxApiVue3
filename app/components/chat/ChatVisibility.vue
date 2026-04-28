@@ -22,14 +22,14 @@ const shareUrl = computed(() => `${window.location.origin}/chat/${props.chatId}`
 const options = [
   {
     value: 'private' as const,
-    label: 'Keep private',
-    description: 'Only you have access',
+    label: '保持私密',
+    description: '仅自己可查看',
     icon: 'i-lucide-lock'
   },
   {
     value: 'public' as const,
-    label: 'Shared',
-    description: 'Anyone with the link can view',
+    label: '公开分享',
+    description: '获得链接的人可查看',
     icon: 'i-lucide-globe'
   }
 ]
@@ -50,7 +50,7 @@ async function updateVisibility(value: 'public' | 'private') {
   } catch {
     emit('update:visibility', previous)
     toast.add({
-      description: 'Failed to update visibility',
+      description: '更新可见性失败',
       icon: 'i-lucide-alert-circle',
       color: 'error'
     })
@@ -72,16 +72,16 @@ function copyLink() {
 
 <template>
   <UModal
-    :title="isShared ? 'Chat shared' : 'Share chat'"
-    :description="isShared ? 'Anyone with the link can view this chat.' : 'Only you can view this chat.'"
+    :title="isShared ? '对话已公开' : '分享对话'"
+    :description="isShared ? '获得链接的人可以查看此对话。' : '只有你自己可以查看此对话。'"
     close
   >
-    <UTooltip text="Share chat">
+    <UTooltip text="分享对话">
       <UButton
         color="neutral"
         variant="ghost"
         icon="i-lucide-share"
-        aria-label="Share chat"
+        aria-label="分享对话"
       />
     </UTooltip>
 
@@ -120,7 +120,7 @@ function copyLink() {
         </a>
 
         <UButton
-          :label="copied ? 'Copied!' : 'Copy link'"
+          :label="copied ? '已复制！' : '复制链接'"
           size="sm"
           color="neutral"
           :variant="copied ? 'soft' : 'solid'"

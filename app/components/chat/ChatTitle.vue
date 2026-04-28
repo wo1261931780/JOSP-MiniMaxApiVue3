@@ -13,7 +13,7 @@ const emit = defineEmits<{
 
 const { renameChat, deleteChat } = useChatActions()
 
-const displayTitle = computed(() => props.title || 'Untitled')
+const displayTitle = computed(() => props.title || '未命名')
 
 async function rename() {
   const newTitle = await renameChat(props.chatId, props.title)
@@ -22,13 +22,13 @@ async function rename() {
 
 const items = computed<DropdownMenuItem[][]>(() => [[
   {
-    label: 'Rename',
+    label: '重命名',
     icon: 'i-lucide-pencil',
     onSelect: rename
   }
 ], [
   {
-    label: 'Delete',
+    label: '删除',
     icon: 'i-lucide-trash',
     color: 'error' as const,
     onSelect: () => deleteChat(props.chatId)

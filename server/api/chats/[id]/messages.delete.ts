@@ -32,15 +32,15 @@ export default defineEventHandler(async (event) => {
 
   const targetIndex = allMessages.findIndex(m => m.id === messageId)
   if (targetIndex === -1) {
-    throw createError({ statusCode: 404, statusMessage: 'Message not found' })
+    throw createError({ statusCode: 404, statusMessage: '消息未找到' })
   }
 
   const targetRole = allMessages[targetIndex]!.role
   if (type === 'edit' && targetRole !== 'user') {
-    throw createError({ statusCode: 400, statusMessage: 'Can only edit user messages' })
+    throw createError({ statusCode: 400, statusMessage: '只能编辑用户消息' })
   }
   if (type === 'regenerate' && targetRole !== 'assistant') {
-    throw createError({ statusCode: 400, statusMessage: 'Can only regenerate assistant messages' })
+    throw createError({ statusCode: 400, statusMessage: '只能重新生成助手消息' })
   }
 
   const startIndex = type === 'edit' ? targetIndex + 1 : targetIndex
