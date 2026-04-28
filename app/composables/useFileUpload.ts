@@ -123,7 +123,7 @@ export function useFileUploadWithStatus(chatId: string) {
         method: 'DELETE',
         headers: { [headerName]: csrf }
       }).catch((error) => {
-        console.error('Failed to delete file from blob:', error)
+        console.error('删除云端文件失败:', error)
       })
     }
   }

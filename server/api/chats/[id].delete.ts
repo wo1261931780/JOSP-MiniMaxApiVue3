@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   if (!chat) {
     throw createError({
       statusCode: 404,
-      statusMessage: 'Chat not found'
+      statusMessage: '对话未找到'
     })
   }
 
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
       await Promise.all(
         blobs.map(b =>
           blob.del(b.pathname).catch(error =>
-            console.error('[delete-chat] Failed to delete file:', b.pathname, error)
+            console.error('[删除对话] 删除文件失败:', b.pathname, error)
           )
         )
       )

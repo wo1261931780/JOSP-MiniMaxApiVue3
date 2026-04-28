@@ -17,8 +17,7 @@ export function useChatActions() {
   const renameModal = overlay.create(LazyModalRename)
   const deleteModal = overlay.create(LazyModalConfirm, {
     props: {
-      title: 'Delete chat',
-      description: 'Are you sure you want to delete this chat? This cannot be undone.',
+      title: '删除对话',
       color: 'error'
     }
   })
@@ -51,7 +50,7 @@ export function useChatActions() {
       return result
     } catch {
       toast.add({
-        description: 'Failed to rename chat',
+        description: '重命名失败',
         icon: 'i-lucide-alert-circle',
         color: 'error'
       })
@@ -73,8 +72,7 @@ export function useChatActions() {
       })
 
       toast.add({
-        title: 'Chat deleted',
-        description: 'Your chat has been deleted',
+        description: '对话已删除',
         icon: 'i-lucide-trash'
       })
 
@@ -90,7 +88,7 @@ export function useChatActions() {
       return true
     } catch {
       toast.add({
-        description: 'Failed to delete chat',
+        description: '删除失败',
         icon: 'i-lucide-alert-circle',
         color: 'error'
       })

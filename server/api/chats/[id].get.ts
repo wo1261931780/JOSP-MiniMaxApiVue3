@@ -19,14 +19,14 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!chat) {
-    throw createError({ statusCode: 404, statusMessage: 'Chat not found' })
+    throw createError({ statusCode: 404, statusMessage: '对话未找到' })
   }
 
   const userId = session.user?.id || session.id
   const isOwner = chat.userId === userId
 
   if (chat.visibility === 'private' && !isOwner) {
-    throw createError({ statusCode: 404, statusMessage: 'Chat not found' })
+    throw createError({ statusCode: 404, statusMessage: '对话未找到' })
   }
 
   const { userId: _, ...rest } = chat

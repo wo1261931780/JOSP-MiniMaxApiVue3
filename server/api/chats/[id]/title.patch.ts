@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!chat) {
-    throw createError({ statusCode: 404, statusMessage: 'Chat not found' })
+    throw createError({ statusCode: 404, statusMessage: '对话未找到' })
   }
 
   const [updated] = await db.update(schema.chats)
@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
     .returning()
 
   if (!updated) {
-    throw createError({ statusCode: 404, statusMessage: 'Chat not found' })
+    throw createError({ statusCode: 404, statusMessage: '对话未找到' })
   }
 
   return updated

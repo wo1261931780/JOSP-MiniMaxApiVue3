@@ -1,18 +1,21 @@
 import type { UIMessage } from 'ai'
-import { convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse, generateText, smoothStream, stepCountIs, streamText } from 'ai'
+import { convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse } from 'ai'
 import { db, schema } from 'hub:db'
 import { and, eq } from 'drizzle-orm'
 import { z } from 'zod'
-import type { AnthropicLanguageModelOptions } from '@ai-sdk/anthropic'
-import { anthropic } from '@ai-sdk/anthropic'
-import type { GoogleLanguageModelOptions } from '@ai-sdk/google'
-// import { google } from '@ai-sdk/google'
-import type { OpenAILanguageModelResponsesOptions } from '@ai-sdk/openai'
-import { openai } from '@ai-sdk/openai'
+
+// MiniMax 真实模型 ID（与 shared/utils/models.ts 保持一致）
+const MODELS = [
+  { label: 'MiniMax-Text-01（代码/分析）', value: 'MiniMax-Text-01' },
+  { label: 'MiniMax-M2（通用助手）', value: 'MiniMax-M2' },
+  { label: 'MiniMax-M2.5-Turbo（快速响应）', value: 'MiniMax-M2.5-Turbo' },
+  { label: 'MiniMax-M2.5-Pro（Pro 版本）', value: 'MiniMax-M2.5-Pro' },
+  { label: 'MiniMax-V2.01（视觉理解）', value: 'MiniMax-V2.01' }
+]
 
 defineRouteMeta({
   openAPI: {
-    description: 'Chat with AI.',
+    description: '与 MiniMax AI 对话',
     tags: ['ai']
   }
 })
@@ -26,7 +29,7 @@ export default defineEventHandler(async (event) => {
 
   const { model, messages } = await readValidatedBody(event, z.object({
     model: z.string().refine(value => MODELS.some(m => m.value === value), {
-      message: 'Invalid model'
+      message: '无效的模型'
     }),
     messages: z.array(z.custom<UIMessage>())
   }).parse)
@@ -40,23 +43,21 @@ export default defineEventHandler(async (event) => {
       messages: true
     }
   })
+
   if (!chat) {
-    throw createError({ statusCode: 404, statusMessage: 'Chat not found' })
+    throw createError({ statusCode: 404, statusMessage: '对话未找到' })
   }
 
+  // 生成对话标题（取用户第一条消息的前30字作为标题）
   if (!chat.title) {
-    const { text: title } = await generateText({
-      model: 'openai/gpt-4.1-nano',
-      system: `You are a title generator for a chat:
-          - Generate a short title based on the first user's message
-          - The title should be less than 30 characters long
-          - The title should be a summary of the user's message
-          - Do not use quotes (' or ") or colons (:) or any other punctuation
-          - Do not use markdown, just plain text`,
-      prompt: JSON.stringify(messages[0])
-    })
-
-    await db.update(schema.chats).set({ title }).where(eq(schema.chats.id, id as string))
+    const userMsg = messages.find(m => m.role === 'user')
+    if (userMsg) {
+      const text = typeof userMsg.content === 'string'
+        ? userMsg.content
+        : userMsg.content?.[0]?.text || ''
+      const title = text.slice(0, 30).trim() + (text.length > 30 ? '...' : '')
+      await db.update(schema.chats).set({ title }).where(eq(schema.chats.id, id as string))
+    }
   }
 
   const lastMessage = messages[messages.length - 1]
@@ -72,76 +73,97 @@ export default defineEventHandler(async (event) => {
   const abortController = new AbortController()
   event.node.req.on('close', () => abortController.abort())
 
+  // 从 runtimeConfig 读取后端地址
+  const config = useRuntimeConfig()
+  const backendUrl = `${config.public.apiBaseUrl}/minimax/chat/chat`
+
   const stream = createUIMessageStream({
     execute: async ({ writer }) => {
-      const result = streamText({
-        abortSignal: abortController.signal,
-        model,
-        system: `You are a knowledgeable and helpful AI assistant. ${session.user?.username ? `The user's name is ${session.user.username}.` : ''} Your goal is to provide clear, accurate, and well-structured responses.
+      // 将 AI SDK 消息格式转换为 MiniMax 格式
+      const minimaxMessages = await convertToModelMessages(messages)
 
-**FORMATTING RULES (CRITICAL):**
-- ABSOLUTELY NO MARKDOWN HEADINGS: Never use #, ##, ###, ####, #####, or ######
-- NO underline-style headings with === or ---
-- Use **bold text** for emphasis and section labels instead
-- Examples:
-  * Instead of "## Usage", write "**Usage:**" or just "Here's how to use it:"
-  * Instead of "# Complete Guide", write "**Complete Guide**" or start directly with content
-- Start all responses with content, never with a heading
-
-**WEB SEARCH:**
-- You have access to a web search tool to find current, up-to-date information
-- Only use it when the user explicitly asks about recent events, real-time data, or current facts
-- Do NOT search proactively — rely on your knowledge first
-- Cite your sources when providing information from web search results
-
-**RESPONSE QUALITY:**
-- Be concise yet comprehensive
-- Use examples when helpful
-- Break down complex topics into digestible parts
-- Maintain a friendly, professional tone`,
-        messages: await convertToModelMessages(messages),
-        tools: {
-          chart: chartTool,
-          weather: weatherTool,
-          ...(model.startsWith('anthropic/') && { web_search: anthropic.tools.webSearch_20250305() }),
-          ...(model.startsWith('openai/') && { web_search: openai.tools.webSearch() })
-          // TODO: enable once AI SDK supports combining provider-defined tools with custom tools
-          // ...(model.startsWith('google/') && { google_search: google.tools.googleSearch({}) })
+      const response = await fetch(backendUrl, {
+        method: 'POST',
+        signal: abortController.signal,
+        headers: {
+          'Content-Type': 'application/json'
         },
-        providerOptions: {
-          anthropic: {
-            thinking: {
-              type: 'enabled',
-              budgetTokens: 2048
+        body: JSON.stringify({
+          model: model,
+          messages: minimaxMessages.map((msg: any) => {
+            if (msg.role === 'user') {
+              return { role: 'user', content: msg.content }
+            } else if (msg.role === 'assistant') {
+              return { role: 'assistant', content: msg.content }
             }
-          } satisfies AnthropicLanguageModelOptions,
-          google: {
-            thinkingConfig: {
-              includeThoughts: true,
-              thinkingLevel: 'low'
-            }
-          } satisfies GoogleLanguageModelOptions,
-          openai: {
-            reasoningEffort: 'low',
-            reasoningSummary: 'detailed'
-          } satisfies OpenAILanguageModelResponsesOptions
-        },
-        stopWhen: stepCountIs(5),
-        experimental_transform: smoothStream()
+            return msg
+          })
+        })
       })
 
-      if (!chat.title) {
+      if (!response.ok) {
+        const errorText = await response.text()
         writer.write({
-          type: 'data-chat-title',
-          data: { message: 'Generating title...' },
-          transient: true
+          type: 'error',
+          content: `[MiniMax API 错误 ${response.status}] ${errorText}`
         })
+        return
       }
 
-      writer.merge(result.toUIMessageStream({
-        sendSources: true,
-        sendReasoning: true
-      }))
+      if (!response.body) {
+        writer.write({ type: 'error', content: '[MiniMax API 错误] 无响应体' })
+        return
+      }
+
+      // 解析后端 SSE 流并转发给前端
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          const chunk = decoder.decode(value, { stream: true })
+          const lines = chunk.split('\n')
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6)
+              if (data === '[DONE]') {
+                writer.write({ type: 'finish' })
+              } else {
+                try {
+                  const parsed = JSON.parse(data)
+                  // MiniMax 流式返回格式：{ choices: [{ delta: { content: "..." } }] }
+                  if (parsed.choices?.[0]?.delta?.content) {
+                    writer.write({
+                      type: 'assistant',
+                      content: [{
+                        type: 'text',
+                        text: parsed.choices[0].delta.content
+                      }]
+                    })
+                  }
+                  if (parsed.choices?.[0]?.finish_reason === 'stop') {
+                    writer.write({ type: 'finish' })
+                  }
+                } catch {
+                  // 非 JSON 内容直接透传
+                  if (data.trim()) {
+                    writer.write({
+                      type: 'assistant',
+                      content: [{ type: 'text', text: data }]
+                    })
+                  }
+                }
+              }
+            }
+          }
+        }
+      } finally {
+        reader.releaseLock()
+      }
     },
     onFinish: async ({ messages }) => {
       await db.insert(schema.messages).values(messages.map(message => ({
@@ -153,7 +175,5 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  return createUIMessageStreamResponse({
-    stream
-  })
+  return createUIMessageStreamResponse({ stream })
 })

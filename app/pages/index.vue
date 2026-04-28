@@ -7,13 +7,13 @@ const { user } = useUserSession()
 
 const greeting = computed(() => {
   const hour = new Date().getHours()
-  let timeGreeting = 'Good evening'
-  if (hour < 12) timeGreeting = 'Good morning'
-  else if (hour < 18) timeGreeting = 'Good afternoon'
+  let timeGreeting = '晚上好'
+  if (hour < 12) timeGreeting = '早上好'
+  else if (hour < 18) timeGreeting = '下午好'
 
   const name = user.value?.name?.split(' ')[0] || user.value?.username
 
-  return name ? `${timeGreeting}, ${name}` : `${timeGreeting}`
+  return name ? `${timeGreeting}，${name}` : `${timeGreeting}`
 })
 
 const {
@@ -62,31 +62,31 @@ async function onSubmit() {
 
 const quickChats = [
   {
-    label: 'Why use Nuxt UI?',
-    icon: 'i-logos-nuxt-icon'
-  },
-  {
-    label: 'Help me create a Vue composable',
+    label: '帮我写一个VueComposable',
     icon: 'i-logos-vue'
   },
   {
-    label: 'Tell me more about UnJS',
-    icon: 'i-logos-unjs'
+    label: '解释一下什么是Nuxt',
+    icon: 'i-logos-nuxt-icon'
   },
   {
-    label: 'Why should I consider VueUse?',
-    icon: 'i-logos-vueuse'
-  },
-  {
-    label: 'Tailwind CSS best practices',
+    label: '前端开发最佳实践',
     icon: 'i-logos-tailwindcss-icon'
   },
   {
-    label: 'What is the weather in Bordeaux?',
+    label: '推荐几个实用的VSCode插件',
+    icon: 'i-lucide-search'
+  },
+  {
+    label: '如何提升代码质量',
+    icon: 'i-lucide-code'
+  },
+  {
+    label: '深圳天气怎么样',
     icon: 'i-lucide-sun'
   },
   {
-    label: 'Show me a chart of sales data',
+    label: '给我展示一个销售数据图表',
     icon: 'i-lucide-line-chart'
   }
 ]
@@ -110,6 +110,9 @@ const quickChats = [
           <h1 class="text-3xl sm:text-4xl text-highlighted font-bold">
             {{ greeting }}
           </h1>
+
+          <!-- MiniMax Function Panel -->
+          <MiniMaxPanel />
 
           <UChatPrompt
             v-model="input"

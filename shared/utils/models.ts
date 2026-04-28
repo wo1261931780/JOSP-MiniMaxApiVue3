@@ -1,5 +1,9 @@
 export const MODELS = [
-  { label: 'Claude Haiku 4.5', value: 'anthropic/claude-haiku-4.5', icon: 'i-simple-icons-anthropic' },
-  { label: 'Gemini 3 Flash', value: 'google/gemini-3-flash', icon: 'i-simple-icons-google' },
-  { label: 'GPT-5 Nano', value: 'openai/gpt-5-nano', icon: 'i-simple-icons-openai' }
+  { label: 'MiniMax-M2.7（自我迭代）', value: 'minimax/m2.7', icon: 'i-simple-icons-microsoftoffice' },
+  { label: 'MiniMax-M2.7-极速版', value: 'minimax/m2.7-highspeed', icon: 'i-simple-icons-microsoftoffice' },
+  { label: 'MiniMax-M2.5（高性价比）', value: 'minimax/m2.5', icon: 'i-simple-icons-microsoftoffice' },
+  { label: 'MiniMax-M2.5-极速版', value: 'minimax/m2.5-highspeed', icon: 'i-simple-icons-microsoftoffice' },
+  { label: 'MiniMax-M2.1（编程能力）', value: 'minimax/m2.1', icon: 'i-simple-icons-microsoftoffice' },
+  { label: 'MiniMax-M2.1-极速版', value: 'minimax/m2.1-highspeed', icon: 'i-simple-icons-microsoftoffice' },
+  { label: 'MiniMax-M2（代码Agent）', value: 'minimax/m2', icon: 'i-simple-icons-microsoftoffice' }
 ]

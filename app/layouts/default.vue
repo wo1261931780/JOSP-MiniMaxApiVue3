@@ -11,7 +11,7 @@ const { data: chats, refresh: refreshChats } = await useFetch('/api/chats', {
   key: 'chats',
   transform: data => data.map(chat => ({
     id: chat.id,
-    label: chat.title || 'Untitled',
+    label: chat.title || '未命名',
     to: `/chat/${chat.id}`,
     icon: 'i-lucide-message-circle',
     createdAt: chat.createdAt
@@ -42,20 +42,20 @@ const items = computed(() => groups.value?.flatMap((group) => {
     ...item,
     slot: 'chat' as const,
     icon: undefined,
-    class: item.label === 'Untitled' ? 'text-muted' : ''
+    class: item.label === '未命名' ? 'text-muted' : ''
   }))]
 }))
 
 function getChatActions(item: { id: string, label: string }): DropdownMenuItem[][] {
   return [[
     {
-      label: 'Rename',
+      label: '重命名',
       icon: 'i-lucide-pencil',
-      onSelect: () => renameChat(item.id, item.label === 'Untitled' ? '' : item.label)
+      onSelect: () => renameChat(item.id, item.label === '未命名' ? '' : item.label)
     }
   ], [
     {
-      label: 'Delete',
+      label: '删除',
       icon: 'i-lucide-trash',
       color: 'error' as const,
       onSelect: () => deleteChat(item.id)
@@ -84,7 +84,7 @@ defineShortcuts({
       <template #header="{ collapsed }">
         <NuxtLink v-if="!collapsed" to="/" class="flex items-end gap-0.5">
           <Logo class="h-8 w-auto shrink-0" />
-          <span class="text-xl font-bold text-highlighted">Chat</span>
+          <span class="text-xl font-bold text-highlighted">对话</span>
         </NuxtLink>
 
         <UDashboardSidebarCollapse class="ms-auto" />
@@ -93,12 +93,12 @@ defineShortcuts({
       <template #default="{ collapsed }">
         <UNavigationMenu
           :items="[{
-            label: 'New chat',
+            label: '新对话',
             to: '/',
             kbds: ['meta', 'o'],
             icon: 'i-lucide-circle-plus'
           }, {
-            label: 'Search',
+            label: '搜索',
             icon: 'i-lucide-search',
             kbds: ['meta', 'k'],
             onSelect: () => {
@@ -144,7 +144,7 @@ defineShortcuts({
                 variant="link"
                 size="sm"
                 class="rounded-[5px] hover:bg-accented/50 focus-visible:bg-accented/50 data-[state=open]:bg-accented/50"
-                aria-label="Chat actions"
+                aria-label="对话操作"
                 tabindex="-1"
                 @click.stop.prevent
               />
@@ -157,7 +157,7 @@ defineShortcuts({
         <UserMenu v-if="loggedIn" :collapsed="collapsed" />
         <UButton
           v-else
-          :label="collapsed ? '' : 'Login with GitHub'"
+          :label="collapsed ? '' : '登录'"
           icon="i-simple-icons-github"
           color="neutral"
           variant="ghost"
@@ -169,11 +169,11 @@ defineShortcuts({
 
     <UDashboardSearch
       v-model:open="searchOpen"
-      placeholder="Search chats..."
+      placeholder="搜索对话..."
       :groups="[{
         id: 'links',
         items: [{
-          label: 'New chat',
+          label: '新对话',
           to: '/',
           icon: 'i-lucide-circle-plus',
           kbds: ['meta', 'o']

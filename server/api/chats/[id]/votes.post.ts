@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
   })
 
   if (!chat) {
-    throw createError({ statusCode: 404, statusMessage: 'Chat not found' })
+    throw createError({ statusCode: 404, statusMessage: '对话未找到' })
   }
 
   const message = await db.query.messages.findFirst({

@@ -20,3 +20,5 @@ export function getDomain(url: string): string {
 export function getFaviconUrl(url: string): string {
   return `https://www.google.com/s2/favicons?sz=32&domain=${getDomain(url)}`
 }
+
+export const API_BASE_URL = '/api/minimax'
