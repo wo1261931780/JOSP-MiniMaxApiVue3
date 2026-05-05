@@ -8,6 +8,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
     "typecheck": "nuxt typecheck",
     "db:generate": "nuxt db generate",
     "db:migrate": "nuxt db migrate"
@@ -46,6 +48,7 @@
     "@types/node": "^24.12.2",
     "drizzle-kit": "^0.31.10",
     "eslint": "^10.2.1",
+    "prettier": "^3.8.1",
     "typescript": "^6.0.3",
     "vue-tsc": "^3.2.7"
   },
